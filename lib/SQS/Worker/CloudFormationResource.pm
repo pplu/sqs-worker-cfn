@@ -92,3 +92,108 @@ package SQS::Worker::CloudFormationResource {
   };
 }
 1;
+
+=head1 NAME
+
+SQS::Worker::CloudFormationResource - A helper to develop your own custom CloudFormation resources
+
+=head1 DESCRIPTION
+
+This is a L<SQS::Worker> role that helps you develop SNS-based CloudFormation Custom Resources that deliver to an
+SQS queue.
+
+More information on SNS based Custom Resources here: L<https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources-sns.html>
+
+=head1 USAGE
+
+  package MyCustomResource {
+    use Moose;
+    with 'SQS::Worker', 'SQS::Worker::CloudFormationResource';
+
+    sub create_resource {
+      my ($self, $request, $result) = @_;
+      # $request is a SQS::Worker::CloudFormationResource::Request
+      # $result  is a SQS::Worker::CloudFormationResource::Response
+    }
+
+    sub update_resource {
+      my ($self, $request, $result) = @_;
+    }
+
+    sub delete_resource {
+      my ($self, $request, $result) = @_;
+    }
+  }
+
+=head1 WRITING A CUSTOM RESOURCE
+
+The worker will poll the SQS queue for you, invoking C<create_resource>, C<update_resource>
+or C<delete_resource> in function of what is happening in CloudFormation, passing them a 
+request object with all the information coming from CloudFormation. Look at L<SQS::Worker::CloudFormationResource::Request>
+for more information on what information a request has. result is an object that has L<SQS::Worker::CloudFormationResource::Response>.
+Set the appropiate properties of the response object. The response object will be returned to CloudFormation.
+
+  $result->Status('SUCCESS');
+  $result->PhysicalResourceId('resource-123456');
+  $result->Data({
+    Color => 'Blue',
+  });
+
+When calling update_resource: C<PhysicalResourceId> will already be initialized to the PhisicalResourceId that was set in C<create_resource>,
+meaning that if it isn't updated, CloudFormation considers the update as a in-place replacement. If a new C<PhysicalResourceId> is assigned,
+CloudFormation considers the operation as a replacement. Later on, CloudFormation will send a Delete for the old PhysicalResourceId, which
+shouldn't be handled as any special case: the C<delete_resource> will be invoked.
+
+Unhandled exceptions in any C<resource_*> methods will be handled, returning a generic "Internal Error" text to CloudFormation,
+considering the resource FAILED.
+
+Unhandled exceptions in C<resource_create> will treat the resource creation as a special case. Since CloudFormation requires a Physical ID to
+be sent, even if we're signalling a FAILURE, SQS::Worker::CloudFormationResource will use an internal Physical ID, that will never be delivered
+to the C<delete_resource> method (it will be intercepted and dropped before getting processed).
+
+=head1 SETTING UP A CUSTOM RESOURCE
+
+To use the resource in CloudFormation, you have to provision an SNS topic that delivers it's messages
+to an SQS queue. You can setup 
+
+  spawn_worker --worker CustomResourceExample1 --queue_url=http://..../QueueURL --region=eu-west-1 --log_conf log.conf
+
+=head1 USING YOUR CUSTOM RESOURCE
+
+  { "resources": [
+    "Custom1": {
+      "Type": "Custom::MyCustomResource",
+      "Version": "1.0",
+      "Properties": {
+        "ServiceToken": "arn:of the SNS topic for the custom resource",
+        ... Resource Properties ...
+      }
+    }
+  ] }
+
+The data you have set in the C<Data> property of the response object will be accessible in CloudFormation templates via the GetAtt
+function.
+
+  { "Fn::GetAtt": [ "Custom1", "Color" ]
+
+=head1 SEE ALSO
+
+L<SQS::Worker>
+
+L<https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources-sns.html>
+
+L<Paws::SQS>
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2018 by CAPSiDE
+
+This code is distributed under the Apache 2 License. The full text of the license can be found in the LICENSE file included with this module.
+
+=head1 AUTHORS
+
+  Jose Luis Martinez
+  JLMARTIN
+  jlmartinez@capside.com
+
+=cut
