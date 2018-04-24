@@ -1,6 +1,7 @@
 requires 'SQS::Worker';
 requires 'Furl';
 requires 'IO::Socket::SSL';
+requires 'JSON::MaybeXS';
 
 on 'develop' => sub {
   requires 'Dist::Zilla';

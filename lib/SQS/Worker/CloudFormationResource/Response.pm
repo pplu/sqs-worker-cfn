@@ -3,7 +3,7 @@ package SQS::Worker::CloudFormationResource::Response {
   enum 'SQS::Worker::CloudFormationResource::StatusType', [qw/SUCCESS FAILED/];
 
   use Moose;
-  use JSON qw/encode_json/;
+  use JSON::MaybeXS;
 
   has Status => (is => 'rw', isa => 'SQS::Worker::CloudFormationResource::StatusType');
   has Reason => (is => 'rw', isa => 'Str');
@@ -23,7 +23,7 @@ package SQS::Worker::CloudFormationResource::Response {
        my $value = $_->get_value($self);
        if(defined $value) { $hash->{$_->name} = $value; }
     }
-    my $json = encode_json $hash;
+    my $json = JSON::MaybeXS->new->encode($hash);
 
     return $json;
   }
