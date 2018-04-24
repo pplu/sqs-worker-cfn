@@ -1,4 +1,5 @@
 package SQS::Worker::CloudFormationResource {
+  our $VERSION = '0.01';
   use Moose::Role;
 
   use SQS::Worker::CloudFormationResource::Request;
