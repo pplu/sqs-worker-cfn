@@ -109,7 +109,7 @@ More information on SNS based Custom Resources here: L<https://docs.aws.amazon.c
 
   package MyCustomResource {
     use Moose;
-    with 'SQS::Worker', 'SQS::Worker::CloudFormationResource';
+    with 'SQS::Worker', 'SQS::Worker::SNS', 'SQS::Worker::CloudFormationResource';
 
     sub create_resource {
       my ($self, $request, $result) = @_;
