@@ -68,13 +68,16 @@ package SQS::Worker::CloudFormationResource {
         $res->Reason('Update failed due to an unhandled internal error');
       }
     } elsif ($req->RequestType eq 'Delete') {
+      # Assign the PhysicalResourceId for the response, as DELETE needs this 
+      # even if the resource fails or succeeds creation
+      $res->PhysicalResourceId($req->PhysicalResourceId);
+
       # When a create fails, and cloudformation rolls back, it sends a
       # DELETE for that rolled back item
       if ($req->PhysicalResourceId eq FAILED_CREATION_ID) {
         $self->log->info("Rollback detected. Skipping delete");
         $res->Status('SUCCESS');
         $res->Reason('Rollback approved');
-        $res->PhysicalResourceId(FAILED_CREATION_ID);
       } else {
         eval {
           $self->delete_resource($req, $res);
@@ -83,7 +86,6 @@ package SQS::Worker::CloudFormationResource {
           $self->log->error($@);
           $res->Status('FAILED');
           $res->Reason('Delete failed due to an unhandled internal error');
-          $res->PhysicalResourceId(FAILED_CREATION_ID);
         }
       }
     } else {
