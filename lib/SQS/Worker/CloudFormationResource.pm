@@ -114,6 +114,8 @@ package SQS::Worker::CloudFormationResource {
       SQS::Worker::CloudFormationResourceException->throw("Unrecognized RequestType " . $req->RequestType);
     }
 
+    $self->log->info(sprintf 'action status %s reason %s', $res->Status, ($res->Reason // '[none specified]'));
+
     # return the response to CloudFormation via the presigned URL that they
     # send you in the message
     $self->http_client->put(
