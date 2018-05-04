@@ -45,6 +45,12 @@ package SQS::Worker::CloudFormationResource {
     );
 
     if ($req->RequestType eq 'Create') {
+      $self->log->info(
+        sprintf "%s create_resource for stack %s logical id: %s", 
+          $req->RequestId,
+          $req->StackId,
+          $req->LogicalResourceId
+      );
       eval {
         $self->create_resource($req, $res);
         $res->PhysicalResourceId(FAILED_CREATION_ID) if (not defined $res->PhysicalResourceId and $res->Status eq 'FAILED');
@@ -58,7 +64,15 @@ package SQS::Worker::CloudFormationResource {
         $res->Reason('Creation failed due to an unhandled internal error');
         $res->PhysicalResourceId(FAILED_CREATION_ID);
       }
+      $self->log->info(sprintf "created physical id: %s", $res->PhysicalResourceId);
     } elsif ($req->RequestType eq 'Update') {
+      $self->log->info(
+        sprintf "%s update_resource for stack %s logical id: %s physical id %s",
+          $req->RequestId,
+          $req->StackId,
+          $req->LogicalResourceId,
+          $req->PhysicalResourceId,
+      );
       eval {
         $self->update_resource($req, $res);
       };
@@ -68,6 +82,14 @@ package SQS::Worker::CloudFormationResource {
         $res->Reason('Update failed due to an unhandled internal error');
       }
     } elsif ($req->RequestType eq 'Delete') {
+      $self->log->info(
+        sprintf "%s create_resource for stack %s logical id: %s physical id %s",
+          $req->RequestId,
+          $req->StackId,
+          $req->LogicalResourceId,
+          $req->PhysicalResourceId,
+      );
+
       # Assign the PhysicalResourceId for the response, as DELETE needs this 
       # even if the resource fails or succeeds creation
       $res->PhysicalResourceId($req->PhysicalResourceId);
