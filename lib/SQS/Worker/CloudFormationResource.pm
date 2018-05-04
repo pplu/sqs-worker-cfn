@@ -47,6 +47,10 @@ package SQS::Worker::CloudFormationResource {
     if ($req->RequestType eq 'Create') {
       eval {
         $self->create_resource($req, $res);
+        $res->PhysicalResourceId(FAILED_CREATION_ID) if (not defined $res->PhysicalResourceId and $res->Status eq 'FAILED');
+        SQS::Worker::CloudFormationResourceException->throw(
+          "No PhysicalResourceId was assigned to the response in the create_resource call"
+        ) if (not defined $res->PhysicalResourceId);
       };
       if ($@) {
         $self->log->error($@);
