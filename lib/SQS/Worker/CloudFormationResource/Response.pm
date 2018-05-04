@@ -4,6 +4,7 @@ package SQS::Worker::CloudFormationResource::Response {
 
   use Moose;
   use JSON::MaybeXS;
+  use SQS::Worker::CloudFormationResourceException;
 
   has Status => (is => 'rw', isa => 'SQS::Worker::CloudFormationResource::StatusType');
   has Reason => (is => 'rw', isa => 'Str');
@@ -16,7 +17,7 @@ package SQS::Worker::CloudFormationResource::Response {
   sub to_json {
     my $self = shift;
     for my $property (qw/Status/) {
-      die "No $property was set up" if (not defined $self->$property);
+      SQS::Worker::CloudFormationResourceException->throw("No $property was set up") if (not defined $self->$property);
     }
     my $hash = {};
     foreach ($self->meta->get_all_attributes) {

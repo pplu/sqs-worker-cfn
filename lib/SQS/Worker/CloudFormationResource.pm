@@ -2,6 +2,7 @@ package SQS::Worker::CloudFormationResource {
   our $VERSION = '0.01';
   use Moose::Role;
 
+  use SQS::Worker::CloudFormationResourceException;
   use SQS::Worker::CloudFormationResource::Request;
   use SQS::Worker::CloudFormationResource::Response;
 
@@ -23,7 +24,9 @@ package SQS::Worker::CloudFormationResource {
   sub process_message {
     my ($self, $sns) = @_;
 
-    die "SQS::Worker::CloudFormationResource only knows how to process SNS::Notification objects" if (not $sns->isa('SNS::Notification'));
+    SQS::Worker::CloudFormationResourceException->throw(
+      "SQS::Worker::CloudFormationResource only knows how to process SNS::Notification objects. Does your worker also consume SQS::Worker::SNS?"
+    ) if (not $sns->isa('SNS::Notification'));
  
     my $json_message = decode_json($sns->Message);
 
@@ -80,7 +83,7 @@ package SQS::Worker::CloudFormationResource {
         }
       }
     } else {
-      die "Unrecognized RequestType " . $req->RequestType;
+      SQS::Worker::CloudFormationResourceException->throw("Unrecognized RequestType " . $req->RequestType);
     }
 
     # return the response to CloudFormation via the presigned URL that they
