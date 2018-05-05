@@ -4,6 +4,11 @@ requires 'IO::Socket::SSL';
 requires 'JSON::MaybeXS';
 requires 'Throwable::Error';
 
+on 'test' => sub {
+  requires 'Test::More';
+  requires 'Test::Exception';
+}
+
 on 'develop' => sub {
   requires 'Dist::Zilla';
   requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
