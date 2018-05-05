@@ -67,8 +67,7 @@ package SQS::Worker::CloudFormationResource {
       };
       if ($@) {
         $self->log->error($@);
-        $res->Status('FAILED');
-        $res->Reason('Creation failed due to an unhandled internal error');
+        $res->set_failed('Creation failed due to an unhandled internal error');
         $res->PhysicalResourceId(FAILED_CREATION_ID);
       }
       $self->log->info(sprintf "created physical id: %s", $res->PhysicalResourceId);
@@ -85,8 +84,7 @@ package SQS::Worker::CloudFormationResource {
       };
       if ($@) {
         $self->log->error($@);
-        $res->Status('FAILED');
-        $res->Reason('Update failed due to an unhandled internal error');
+        $res->set_failed('Update failed due to an unhandled internal error');
       }
     } elsif ($req->RequestType eq 'Delete') {
       $self->log->info(
@@ -105,16 +103,14 @@ package SQS::Worker::CloudFormationResource {
       # DELETE for that rolled back item
       if ($req->PhysicalResourceId eq FAILED_CREATION_ID) {
         $self->log->info("Rollback detected. Skipping delete");
-        $res->Status('SUCCESS');
-        $res->Reason('Rollback approved');
+        $res->set_success('Rollback approved');
       } else {
         eval {
           $self->delete_resource($req, $res);
         };
         if ($@) {
           $self->log->error($@);
-          $res->Status('FAILED');
-          $res->Reason('Delete failed due to an unhandled internal error');
+          $res->set_failed('Delete failed due to an unhandled internal error');
         }
       }
     } else {
@@ -174,7 +170,7 @@ request object with all the information coming from CloudFormation. Look at L<SQ
 for more information on what information a request has. result is an object that has L<SQS::Worker::CloudFormationResource::Response>.
 Set the appropiate properties of the response object. The response object will be returned to CloudFormation.
 
-  $result->Status('SUCCESS');
+  $result->set_success('Created resource'); # the success message will show in the cloudformation log
   $result->PhysicalResourceId('resource-123456');
   $result->Data({
     Color => 'Blue',
