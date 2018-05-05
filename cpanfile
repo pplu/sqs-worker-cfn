@@ -7,7 +7,7 @@ requires 'Throwable::Error';
 on 'test' => sub {
   requires 'Test::More';
   requires 'Test::Exception';
-}
+};
 
 on 'develop' => sub {
   requires 'Dist::Zilla';
