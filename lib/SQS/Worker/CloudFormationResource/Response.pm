@@ -14,6 +14,18 @@ package SQS::Worker::CloudFormationResource::Response {
   has LogicalResourceId => (is => 'ro', isa => 'Str', required => 1);
   has Data => (is => 'rw', isa => 'HashRef[Any]');
 
+  sub set_failed {
+    my ($self, $reason) = @_;
+    $self->Status('FAILED');
+    $self->Reason($reason) if (defined $reason);
+  }
+
+  sub set_success {
+    my ($self, $reason) = @_;
+    $self->Status('SUCCESS');
+    $self->Reason($reason) if (defined $reason);
+  }
+
   sub to_json {
     my $self = shift;
     for my $property (qw/Status/) {
