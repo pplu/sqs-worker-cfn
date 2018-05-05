@@ -61,6 +61,9 @@ package SQS::Worker::CloudFormationResource {
         SQS::Worker::CloudFormationResourceException->throw(
           "No PhysicalResourceId was assigned to the response in the create_resource call"
         ) if (not defined $res->PhysicalResourceId);
+        SQS::Worker::CloudFormationResourceException->throw(
+          "No Status was assigned to the response"
+        ) if (not defined $res->Status);
       };
       if ($@) {
         $self->log->error($@);
