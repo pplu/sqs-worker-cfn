@@ -2,6 +2,10 @@ package SQS::Worker::CloudFormationResource {
   our $VERSION = '0.01';
   use Moose::Role;
 
+  requires 'create_resource';
+  requires 'update_resource';
+  requires 'delete_resource';
+
   use SQS::Worker::CloudFormationResourceException;
   use SQS::Worker::CloudFormationResource::Request;
   use SQS::Worker::CloudFormationResource::Response;
