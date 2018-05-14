@@ -216,6 +216,30 @@ function.
 
   { "Fn::GetAtt": [ "Custom1", "Color" ] }
 
+=head1 METHODS
+
+=head2 create_resource($request, $response)
+
+Implement this method in your Custom Resource worker class. All properties sent by CloudFormation will be in C<$request> of type 
+L<SQS::Worker::CloudFormationResource::Request>. This method should modify C<$response> to control what will be sent to CloudFormation.
+The following can be done:
+
+Either call C<set_success> or C<set_failed>
+
+Set attribute C<PhysicalResourceId> (C<$response-&gt;('resource-123456');>)
+
+Set attribute C<Data> to a Hashref with the keys and values that CloudFormation will treat as this objects attributes
+
+=head2 update_resource
+
+Implement this method in your Custom Resource worker class.
+
+=head2 delete_resource
+
+Implement this method in your Custom Resource worker class.
+
+Either call C<set_success> or C<set_failed> to indicate that the resource was deleted or not
+
 =head1 SEE ALSO
 
 L<SQS::Worker>
