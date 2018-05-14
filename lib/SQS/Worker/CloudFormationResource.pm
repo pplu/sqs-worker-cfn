@@ -193,7 +193,8 @@ to the C<delete_resource> method (it will be intercepted and dropped before gett
 =head1 SETTING UP A CUSTOM RESOURCE
 
 To use the resource in CloudFormation, you have to provision an SNS topic that delivers it's messages
-to an SQS queue. You can setup 
+to an SQS queue. You can setup an SNS topic with the bundled C<examples/sns-topic-for-cloudformation.json> file (which will output
+all the data you need to run the worker
 
   spawn_worker --worker CustomResourceExample1 --queue_url=http://..../QueueURL --region=eu-west-1 --log_conf log.conf
 
