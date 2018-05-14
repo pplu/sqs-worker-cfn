@@ -141,6 +141,8 @@ SQS queue.
 
 More information on SNS based Custom Resources here: L<https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources-sns.html>
 
+This module takes care of lots of repetitive work when building an SNS-based CloudFormation Custom Resource.
+
 =head1 USAGE
 
   package MyCustomResource {
@@ -211,7 +213,7 @@ to an SQS queue. You can setup
 The data you have set in the C<Data> property of the response object will be accessible in CloudFormation templates via the GetAtt
 function.
 
-  { "Fn::GetAtt": [ "Custom1", "Color" ]
+  { "Fn::GetAtt": [ "Custom1", "Color" ] }
 
 =head1 SEE ALSO
 
