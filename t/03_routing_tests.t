@@ -100,7 +100,7 @@ package FakeHTTP {
   like($response, qr|"Status":"SUCCESS"|, 'send cfn a success'); 
   like($response, qr|"Reason":"called create_resource"|, 'with the message from the create_resource function'); 
   like($response, qr|"PhysicalResourceId":"resource-id1"|, 'sent the correct resource id');
-  like($response, qr|"Data":{"Result1":"Result1Value"}|, 'got the data back');
+  like($response, qr|"Data":\{"Result1":"Result1Value"}|, 'got the data back');
 
   $response = undef;
   $w->process_message(make_sns_notification(
