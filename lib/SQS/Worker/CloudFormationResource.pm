@@ -79,6 +79,9 @@ package SQS::Worker::CloudFormationResource {
           $req->LogicalResourceId,
           $req->PhysicalResourceId,
       );
+
+      $res->PhysicalResourceId($req->PhysicalResourceId);
+
       eval {
         $self->update_resource($req, $res);
       };
